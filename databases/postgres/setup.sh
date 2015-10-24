@@ -11,6 +11,7 @@ DATABASES=(
   "client001"
   "client002"
   "client003"
+  "company"
 )
 
 for DB_NAME in "${DATABASES[@]}"; do
@@ -25,6 +26,12 @@ else
   gosu postgres psql user $POSTGRES_USER <<-EOSQL
 		CREATE DATABASE "$DB_NAME";
 	EOSQL
+
+  DB_SCHEMA="/docker-entrypoint-initdb.d/schemas/${DB_NAME}.sql"
+  if [[ -f $DB_SCHEMA ]]; then
+    echo "SETUP: Creating database schema"
+    gosu postgres psql --dbname "$DB_NAME" < $DB_SCHEMA
+  fi
   echo "SETUP: Created database"
 fi
 done
