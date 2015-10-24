@@ -5,6 +5,14 @@ log() {
   echo "SETUP: $1"
 }
 
+pgExecQuery() {
+  gosu postgres psql -c "$1"
+}
+
+pgExecScript() {
+  gosu postgres psql --dbname "$1" < "$2"
+}
+
 DATABASES=(
   "notification"
   "file"
@@ -19,26 +27,22 @@ DATABASES=(
 log "Setuping databases"
 
 for DB_NAME in "${DATABASES[@]}"; do
-EXISTS=`gosu postgres psql user $POSTGRES_USER <<-EOSQL
-  SELECT 1 FROM pg_database WHERE datname='$DB_NAME';
-EOSQL`
+  EXISTS=$(pgExecQuery "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'")
 
-if [[ $EXISTS == "1" ]]; then
-  log "Database [$DB_NAME] already exists"
-else
-  gosu postgres psql user $POSTGRES_USER <<-EOSQL
-		CREATE DATABASE "$DB_NAME";
-	EOSQL
-  log "Creating database [$DB_NAME]"
+  if [[ $EXISTS == "1" ]]; then
+    log "Database [$DB_NAME] already exists"
+  else
+    log "Creating database [$DB_NAME]"
+    pgExecQuery "CREATE DATABASE \"$DB_NAME\""
 
-  DB_SCHEMA="/docker-entrypoint-initdb.d/schemas/${DB_NAME}.sql"
-  if [[ -f $DB_SCHEMA ]]; then
-    gosu postgres psql --dbname "$DB_NAME" < $DB_SCHEMA
-    log "Creating database schema"
+    DB_SCHEMA="/docker-entrypoint-initdb.d/schemas/${DB_NAME}.sql"
+    if [[ -f $DB_SCHEMA ]]; then
+      log "Creating database schema"
+      pgExecScript $DB_NAME $DB_SCHEMA
+    fi
+
+    log "Created database"
   fi
-  log "Created database"
-fi
 done
 
-
-echo "SETUP: Finished databases setup"
+log "Finished databases setup"
