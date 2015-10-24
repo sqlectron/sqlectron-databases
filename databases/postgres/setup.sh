@@ -14,6 +14,7 @@ pgExecScript() {
 }
 
 DATABASES=(
+  "registration"
   "notification"
   "file"
   "content"

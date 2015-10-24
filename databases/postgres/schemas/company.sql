@@ -1,4 +1,4 @@
-CREATE TABLE company(
+CREATE TABLE companies(
    id INT PRIMARY KEY     NOT NULL,
    name           TEXT    NOT NULL,
    age            INT     NOT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE company(
    salary         REAL
 );
 
-CREATE TABLE department(
+CREATE TABLE departments(
    id INT PRIMARY KEY      NOT NULL,
    dept           CHAR(50) NOT NULL,
    emp_id         INT      NOT NULL
