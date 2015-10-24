@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "******SETUPING DATABASES******"
+echo "SETUP: Setuping databases"
 
 DATABASES=(
   "notification"
@@ -18,16 +18,16 @@ EXISTS=`gosu postgres psql user $POSTGRES_USER <<-EOSQL
   SELECT 1 FROM pg_database WHERE datname='$DB_NAME';
 EOSQL`
 
-echo "******CREATING DATABASE [$DB_NAME]******"
 if [[ $EXISTS == "1" ]]; then
-  echo "******DATABASE [$DB_NAME] ALREADY EXISTS******"
+  echo "SETUP: Database [$DB_NAME] already exists"
 else
+  echo "SETUP: Creating database [$DB_NAME]"
   gosu postgres psql user $POSTGRES_USER <<-EOSQL
 		CREATE DATABASE "$DB_NAME";
 	EOSQL
-  echo "******CREATED DATABASE [$DB_NAME]******"
+  echo "SETUP: Created database"
 fi
 done
 
 
-echo "******CREATED ALL DATABASES******"
+echo "SETUP: Finished databases setup"
