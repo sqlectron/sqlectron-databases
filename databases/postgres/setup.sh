@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-echo "SETUP: Setuping databases"
+log() {
+  echo "SETUP: $1"
+}
 
 DATABASES=(
   "notification"
@@ -14,25 +16,27 @@ DATABASES=(
   "company"
 )
 
+log "Setuping databases"
+
 for DB_NAME in "${DATABASES[@]}"; do
 EXISTS=`gosu postgres psql user $POSTGRES_USER <<-EOSQL
   SELECT 1 FROM pg_database WHERE datname='$DB_NAME';
 EOSQL`
 
 if [[ $EXISTS == "1" ]]; then
-  echo "SETUP: Database [$DB_NAME] already exists"
+  log "Database [$DB_NAME] already exists"
 else
-  echo "SETUP: Creating database [$DB_NAME]"
   gosu postgres psql user $POSTGRES_USER <<-EOSQL
 		CREATE DATABASE "$DB_NAME";
 	EOSQL
+  log "Creating database [$DB_NAME]"
 
   DB_SCHEMA="/docker-entrypoint-initdb.d/schemas/${DB_NAME}.sql"
   if [[ -f $DB_SCHEMA ]]; then
-    echo "SETUP: Creating database schema"
     gosu postgres psql --dbname "$DB_NAME" < $DB_SCHEMA
+    log "Creating database schema"
   fi
-  echo "SETUP: Created database"
+  log "Created database"
 fi
 done
 
