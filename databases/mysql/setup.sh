@@ -1,7 +1,19 @@
 #!/bin/bash
 set -e
 
-echo "******SETUPING DATABASES******"
+log() {
+  echo "SETUP: $1"
+}
+
+log "Creating user with no password"
+MYSQL_USER_NO_PWD="usernopwd"
+
+mysql -u root -p"${MYSQL_ROOT_PASSWORD}" << EOF
+CREATE USER \`$MYSQL_USER_NO_PWD\`@`%`;
+GRANT ALL privileges ON \`authentication\`.* TO \`$MYSQL_USER_NO_PWD\`@`%`;
+EOF
+
+log "Setuping databases"
 
 DATABASES=(
   "notification"
@@ -15,15 +27,16 @@ DATABASES=(
 
 for DB_NAME in "${DATABASES[@]}"; do
 
-echo "******SETUPING DATABASE [$DB_NAME]****** $MYSQL_USER $MYSQL_PASSWORD"
+log "Setuping database [$DB_NAME]"
 
 mysql -u root -p"${MYSQL_ROOT_PASSWORD}" << EOF
 
 CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8 COLLATE utf8_general_ci;
 GRANT ALL privileges ON \`$DB_NAME\`.* TO \`$MYSQL_USER\`@`%` IDENTIFIED BY 'password';
+GRANT ALL privileges ON \`$DB_NAME\`.* TO \`$MYSQL_USER_NO_PWD\`@`%`;
 
 EOF
 
 done
 
-echo "******CREATED ALL DATABASES******"
+log "Finished databases setup"
