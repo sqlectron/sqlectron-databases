@@ -4,7 +4,7 @@ This project only includes scripts to setup the development environment with sev
 
 You might you use it in the projects:
 
-- [sqlectron](https://github.com/sqlectron/sqlectron)
+- [sqlectron-gui](https://github.com/sqlectron/sqlectron-gui)
 - [sqlectron-term](https://github.com/sqlectron/sqlectron-term)
 
 ## Bring up all databases
