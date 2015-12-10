@@ -14,6 +14,7 @@ pgExecScript() {
 }
 
 DATABASES=(
+  "database_with_really_really_really_really_really_very_long_name"
   "registration"
   "notification"
   "file"
