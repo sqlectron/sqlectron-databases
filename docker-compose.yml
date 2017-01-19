@@ -16,3 +16,11 @@ postgres:
     POSTGRES_PASSWORD: password
   volumes:
     - ./databases/postgres:/docker-entrypoint-initdb.d
+
+sqlserver:
+  image: microsoft/mssql-server-linux:latest
+  ports:
+    - '1433:1433'
+  environment:
+    ACCEPT_EULA: Y
+    SA_PASSWORD: Strong!Passw0rd
